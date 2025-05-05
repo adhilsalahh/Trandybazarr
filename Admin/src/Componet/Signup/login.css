@@ -1,0 +1,12 @@
+.login{
+    background-color:rgb(255, 255, 255);
+    background-image:
+    radial-gradient(at 47% 100%, hsla(26,100%,83%,1) 0px, transparent 50%),
+    radial-gradient(at 84% 0%, hsla(189,100%,83%,1) 0px, transparent 50%),
+    radial-gradient(at 0% 61%, hsla(354,100%,83%,1) 0px, transparent 50%),
+    radial-gradient(at 98% 37%, hsla(339,100%,83%,1) 0px, transparent 50%),
+    radial-gradient(at 56% 22%, hsla(306,100%,83%,1) 0px, transparent 50%),
+    radial-gradient(at 94% 100%, hsla(240,100%,83%,1) 0px, transparent 50%),
+    radial-gradient(at 1% 0%, hsla(240,100%,83%,1) 0px, transparent 50%);
+ 
+}

@@ -1,0 +1,26 @@
+:root{
+  font-family: "Quicksand", sans-serif !important;
+
+}
+*{
+    margin: 0;
+    list-style: none;
+    font-family: "Quicksand", sans-serif !important;
+  
+    padding: 0;
+          box-sizing: border-box;
+  }
+  .admin-panels-componet{
+    margin-left: 16.5%;
+    padding: 10px;
+  }
+  .title{
+    font-size: 20px;
+    font-weight: 700;
+  }
+  @media only screen and (max-width: 600px) {
+    .admin-panels-componet {
+      margin-left: 0px;
+      padding: 10px;
+  } 
+  }

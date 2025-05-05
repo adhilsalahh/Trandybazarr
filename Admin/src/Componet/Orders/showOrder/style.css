@@ -1,0 +1,41 @@
+.order-table-container {
+    overflow-x: auto;
+    margin: 20px;
+}
+
+.table-wrapper {
+    display: inline-block;
+    min-width: 100%;
+}
+
+.custom-table th, .custom-table td {
+    white-space: nowrap;
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+ 
+
+.color-indicator {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.sticky-header {
+    position: sticky;
+    top: 0;
+    background-color: #f0f0f0;
+    z-index: 1;
+}
+.order-show{
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 15px;
+}

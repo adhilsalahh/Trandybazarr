@@ -1,0 +1,6 @@
+https://trendybazarr.onrender.com/api/order/orders// Get all orders
+https://trendybazarr.onrender.com/api/order/get/:id // Get a specific order by ID
+https://trendybazarr.onrender.com/api/order/put/:id  // Update a specific order by ID
+https://trendybazarr.onrender.com/api/order/del/:id  // Delete a specific order by ID
+
+https://trendybazarr.onrender.com/api/order/create  //create Order

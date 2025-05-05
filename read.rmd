@@ -1,0 +1,38 @@
+admin-panel/
+│
+├── config/
+│   └── db.js          # Database connection file
+│
+├── controllers/
+│   └── adminController.js # Admin login and data management logic
+│
+├── middlewares/
+│   └── authMiddleware.js  # JWT Authentication middleware
+│
+├── models/
+│   ├── Admin.js        # Admin schema
+│   └── Data.js         # Data schema
+│
+├── routes/
+│   ├── authRoutes.js   # Auth routes (login)
+│   └── dataRoutes.js   # Data management routes (upload, edit, delete)
+│
+├── .env                # Environment variables
+├── server.js           # Main server file
+└── package.json
+
+
+https://trendybazarr.onrender.com/api/admin/register #Admin registration route
+https://trendybazarr.onrender.com/api/auth/login     //Admin Login
+https://trendybazarr.onrender.com/api/data/upload    //add Product
+https://trendybazarr.onrender.com/api/data/gets    //get all products
+https://trendybazarr.onrender.com/api/data/get/:id    //get one product
+https://trendybazarr.onrender.com/api/data/edit/:id    //update Product
+https://trendybazarr.onrender.com/api/data/delete/:id   //delete Product
+
+https://trendybazarr.onrender.com/api/order/create  //create Order
+https://trendybazarr.onrender.com/api/order/orders// Get all orders
+https://trendybazarr.onrender.com/api/order/get/:id // Get a specific order by ID
+https://trendybazarr.onrender.com/api/order/put/:id  // Update a specific order by ID
+https://trendybazarr.onrender.com/api/order/del/:id  // Delete a specific order by ID
+
