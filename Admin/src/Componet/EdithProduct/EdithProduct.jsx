@@ -28,7 +28,8 @@ const EditProduct = () => {
   //   const [setProduct,Product]=useState(null);
   //
   //
-  const categorys = ["Clothing", "footwear", " accessories"];
+    const categorys = ["Fashion", "Accessories", " phones" , "Electronics","Home & Living"];
+
   const types = ["Tshirt", "Jeans", " Pant", "Hoodie", "Speaker", "Shoes", "Watch", "Sunglass", "Wallet ", " Headphone"];
   //
   //
