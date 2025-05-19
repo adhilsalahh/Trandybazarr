@@ -9,6 +9,7 @@ function Products() {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     category: '',
     priceRange: { min: '', max: '' },
@@ -20,7 +21,6 @@ function Products() {
     try {
       const response = await fetch('https://trendybazarr.onrender.com/api/data/gets');
       const data = await response.json();
-      console.log(data);
       setProducts(data.data);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -38,12 +38,20 @@ function Products() {
     setTimeout(() => setShowNotification(false), 3000);
   };
 
-  // Filter and sort products
-  const filteredProducts = Object.values(Products||products).filter(product => {
-    const matchesCategory = !filters.category || product.category.toLowerCase() === filters.category.toLowerCase();
+  // Filter and search products
+  const filteredProducts = Object.values(Products || products).filter(product => {
+    const matchesSearch = searchQuery.toLowerCase() === '' || 
+      product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.Producttype?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.Type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.tags && product.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+
+    const matchesCategory = !filters.category || product.category?.toLowerCase() === filters.category.toLowerCase();
     const matchesPriceRange = (!filters.priceRange.min || product.price >= filters.priceRange.min) &&
                              (!filters.priceRange.max || product.price <= filters.priceRange.max);
-    return matchesCategory && matchesPriceRange;
+    
+    return matchesSearch && matchesCategory && matchesPriceRange;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -72,6 +80,8 @@ function Products() {
             <div className="relative">
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
                        focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -171,7 +181,7 @@ function Products() {
           >
             <Link to={`/product/${product.id}`} className="block relative">
               <img
-                src={product.images[0]}
+                src={product.images[0].imageUrl}
                 alt={product.name}
                 className="w-full aspect-square object-cover transform transition-transform 
                          duration-500 group-hover:scale-110"

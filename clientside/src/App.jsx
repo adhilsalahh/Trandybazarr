@@ -31,7 +31,6 @@ import Layout from './components/Layout';
 import Products from './pages/Products';
 import CategoryPage from './pages/CategoryPage';
 import ProductPage from './pages/ProductPage';
-import AdminPanel from './pages/AdminPanel';
 
 function App() {
 
@@ -107,7 +106,7 @@ const Product_DATA_GET = async () => {
               <Route path="/address-list" element={<AddressList />} />
               <Route path="/supplier/login" element={<SupplierLogin />} />
               <Route path="/supplier/register" element={<SupplierRegister />} />
-              <Route path="/admin/dashboard" element={<AdminPanel />} />
+              
             </Routes>
             <Footer />
           </div>

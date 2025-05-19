@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     name: '',
     number: '',
@@ -24,8 +25,6 @@ export default function Register() {
     setLoading(true);
     try {
       const response = await fetch('http://localhost:5000/api/users/register', {
-
-
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +44,14 @@ export default function Register() {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/login');
+        
+        if (location.state?.redirectTo && location.state?.product) {
+          navigate(location.state.redirectTo, { 
+            state: { product: location.state.product }
+          });
+        } else {
+          navigate('/login');
+        }
       } else {
         setError(data.message || 'Registration failed');
       }
@@ -54,21 +60,7 @@ export default function Register() {
     } finally {
       setLoading(false);
     }
-
-//     const data = await response.json();
-// console.log('Registration response:', data); // ✅ helpful log
-
-// if (response.ok) {
-//   localStorage.setItem('token', data.token);
-//   localStorage.setItem('user', JSON.stringify(data.user));
-//   navigate('/login');
-// } else {
-//   setError(data.message || 'Registration failed');
-// }
-
-    
   };
-
 
   const handleChange = (e) => {
     setFormData({
