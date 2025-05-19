@@ -66,6 +66,7 @@ function ProductPage({ Products }) {
             >
               <Heart className={`w-6 h-6 ${wishlist.includes(product) ? 'text-red-500 fill-current' : 'text-gray-400'}`} />
             </button>
+
           </div>
           <div className="grid grid-cols-4 gap-4">
             {product.images.map((image, index) => (
@@ -76,6 +77,7 @@ function ProductPage({ Products }) {
                   selectedImage === index ? 'ring-2 ring-indigo-500' : ''
                 }`}
               >
+            
                 <img
                   src={image.imageUrl}
                   alt={product.name}

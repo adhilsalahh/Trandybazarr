@@ -18,6 +18,18 @@ export default function FeaturedProducts({ Products }) {
     setTimeout(() => setShowNotification(false), 2000);
   };
 
+  const calculateDiscount = (price, discountPrice) => {
+    if (!discountPrice) return null;
+    const originalPrice = parseFloat(price);
+    const discounted = parseFloat(discountPrice);
+    const savings = originalPrice - discounted;
+    const percentage = ((savings / originalPrice) * 100).toFixed(0);
+    return {
+      savings: savings.toFixed(2),
+      percentage
+    };
+  };
+
   return (
     <section className="py-16 bg-teal-50/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,6 +50,7 @@ export default function FeaturedProducts({ Products }) {
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-6 lg:gap-8">
           {Products.map((product) => {
+            const discount = calculateDiscount(product.price, product.discountPrice);
             return (
               <div
                 key={product._id}
@@ -51,9 +64,11 @@ export default function FeaturedProducts({ Products }) {
                     className="w-full aspect-square object-cover transform transition-transform 
                              duration-500 group-hover:scale-110"
                   />
-                  <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
-                    {product.discountPrice ? `-${product.discountPrice}` : ''}
-                  </div>
+                  {discount && (
+                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                      -{discount.percentage}%
+                    </div>
+                  )}
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -95,25 +110,26 @@ export default function FeaturedProducts({ Products }) {
                       ({product.reviews})
                     </span>
                   </div>
-                  <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-sm sm:text-xl font-bold text-gray-900 dark:text-white">
-                      ${product.price}
-                    </span>
-                    {product.discountPrice && (
-                      <span className="text-xs sm:text-sm text-gray-500 line-through">
-                        ${parseInt(product.price + product.discountPrice)}
+                  <div className="flex flex-col space-y-1 mb-2">
+                    {product.discountPrice ? (
+                      <>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm sm:text-xl font-bold text-gray-900 dark:text-white">
+                            ₹{product.discountPrice}
+                          </span>
+                          <span className="text-xs sm:text-sm text-gray-500 line-through">
+                            ₹{product.price}
+                          </span>
+                        </div>
+                        <span className="text-xs sm:text-sm text-green-600 font-medium">
+                          Save ₹{discount.savings} ({discount.percentage}% off)
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-sm sm:text-xl font-bold text-gray-900 dark:text-white">
+                        ₹{product.price}
                       </span>
                     )}
-                    <span className="text-xs sm:text-sm text-red-500 font-medium">
-                      {product.discountPrice ? `Save ${(product.price - (product.price - product.discountPrice)).toFixed(2)}` : ''}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {product.sizes?.map((size) => (
-                      <span key={size} className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                        ({size.unit}): {size.values}
-                      </span>
-                    ))}
                   </div>
                   <button 
                     onClick={(e) => {
