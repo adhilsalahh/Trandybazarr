@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Register() {
-  const navigate = useNavigate();  // Use for navigation after successful registration
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     number: '',
@@ -11,29 +11,21 @@ export default function Register() {
     password: '',
     confirmPassword: ''
   });
-  const [error, setError] = useState(''); // Error message state
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission state
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Prevent submitting while already submitting
-    if (isSubmitting) return;
-
-    setIsSubmitting(true);  // Set submission state to true
-    setLoading(true);  // Show loading spinner or message
-
-    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
-      setLoading(false);
-      setIsSubmitting(false);
       return;
     }
 
+    setLoading(true);
     try {
-      const response = await fetch('https://trendybazarr.onrender.com/api/users/register', {
+      const response = await fetch('http://localhost:5000/api/users/register', {
+
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,10 +40,12 @@ export default function Register() {
       });
 
       const data = await response.json();
+      console.log('Registration response:', data);
 
       if (response.ok) {
-        alert('Registration successful!');
-        navigate('/login'); // Navigate to login page after successful registration
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        navigate('/login');
       } else {
         setError(data.message || 'Registration failed');
       }
@@ -59,16 +53,29 @@ export default function Register() {
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
-      setIsSubmitting(false);  // Reset submission state
     }
+
+//     const data = await response.json();
+// console.log('Registration response:', data); // ✅ helpful log
+
+// if (response.ok) {
+//   localStorage.setItem('token', data.token);
+//   localStorage.setItem('user', JSON.stringify(data.user));
+//   navigate('/login');
+// } else {
+//   setError(data.message || 'Registration failed');
+// }
+
+    
   };
+
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
-    setError(''); // Clear error on input change
+    setError('');
   };
 
   return (
@@ -167,8 +174,10 @@ export default function Register() {
 
           <button
             type="submit"
-            disabled={loading || isSubmitting} // Disable button during submission
-            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${loading || isSubmitting ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+            disabled={loading}
+            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+              loading ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
