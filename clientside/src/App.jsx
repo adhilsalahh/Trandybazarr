@@ -28,7 +28,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
 import Layout from './components/Layout';
-import Products from './pages/Products';
+// import Products from './pages/Products';
 import CategoryPage from './pages/CategoryPage';
 import ProductPage from './pages/ProductPage';
 
@@ -53,16 +53,15 @@ const Product_DATA_GET = async () => {
     document.documentElement.classList.toggle('dark');
   };
 
-  const ScrollToTop = () => {
-    const { pathname } = useLocation();
-  
-    React.useEffect(() => {
-      Product_DATA_GET();
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
 
-    }, [pathname]);
-  
-    return null;
-  };
+  React.useEffect(() => {
+    Product_DATA_GET();
+  }, [pathname]);
+
+  return null;
+};
 
   return (
     <Router basename="/TrendyBazarr">
@@ -82,7 +81,7 @@ const Product_DATA_GET = async () => {
                   </div>
                 </main>
               } />
-              <Route path="/products" element={<Products Products={Products} />} />
+              {/* <Route path="/products" element={<Products Products={Products} />} /> */}
               <Route path="/category/:category" element={<CategoryPage Products={Products} />} />
               <Route path="/product/:id" element={<ProductPage Products={Products} />} />
               <Route path="/login" element={<Login />} />

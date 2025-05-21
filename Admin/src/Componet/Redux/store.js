@@ -1,12 +1,12 @@
+import { configureStore } from "@reduxjs/toolkit";
+import EdithSlice from './EdithSlice';
+import formslice from '../../reduxtoolkit/CategorySlice';
 
-// import { configureStore } from "@reduxjs/toolkit";
-// import EdithSlice from '../Redux/EdithSlice'
+export const store = configureStore({
+  reducer: {
+    Edith: EdithSlice,
+    category: formslice
+  }
+});
 
-// const store = configureStore({
-//   reducer: {
-//     // form: formslice // Correcting the reducer key and value
-//     Edith:EdithSlice
-//   }
-// });
-
-// export default store;
+export default store;
