@@ -262,8 +262,8 @@ const ProductForm = () => {
 // React State and Handlers
 const [file, setFile] = useState(null);
 
-const CLOUD_NAME = 'dsxcm3fie'; // Replace with your Cloudinary cloud name
-const UPLOAD_PRESET = 'Img_upload_preset'; // Replace with your Cloudinary upload preset
+const CLOUD_NAME = 'dljrcyvdi'; // Replace with your Cloudinary cloud name
+const UPLOAD_PRESET = 'Imy_preset'; // Replace with your Cloudinary upload preset
 
 // Handle file selection
 const handleFileChange = (e) => {
@@ -271,6 +271,7 @@ const handleFileChange = (e) => {
 };
 
 // Handle image upload
+// The handleUpload function should then use these variables:
 const handleUpload = async (index) => {
   if (!file) {
     alert('Please select a file first');
@@ -488,63 +489,88 @@ const handleUpload = async (index) => {
               ))}
             </div>
 
-            <label>Size (e.g.,(S, M, XL), Inch, CM):</label>
-            <select
-              name="sizeUnit"
-              value={sizeUnit}
-              onChange={handleSizeUnitChange}
-              required
-              className="w-full p-2 border border-gray-300 rounded"
-            >
-              <option value="">Select Size Type</option>
-              <option value="inch">Inch</option>
-              <option value="cm">CM</option>
-              <option value="letter">Clothing Sizes</option>
-            </select>
-            {Error.size && (
-              <p className="text-red-500">{Error.size}</p>
-            )}
-            {formData.size.unit === "inch" && (
-              <input
-                type="text" // Change to text to accept multiple values
-                name="sizeValue"
-                value={formData.size.values.join(", ") || ""} // Display multiple values as a string
-                onChange={handileaddsize}
-                placeholder="Available sizes (e.g., 10, 9, 7...)"
-                required
-                className="w-full p-2 border border-gray-300 rounded"
-              />
-            )}
+           <label className="block font-medium text-gray-700 mb-1">
+  Select Size Unit <span className="text-red-500">*</span>
+</label>
+<select
+  name="sizeUnit"
+  value={sizeUnit}
+  onChange={handleSizeUnitChange}
+  required
+  className="w-full p-2 border border-gray-300 rounded mb-2"
+>
+  <option value="">-- Choose Size Format --</option>
+  <option value="inch">Numeric (Inch)</option>
+  <option value="cm">Numeric (CM)</option>
+  <option value="letter">Clothing (S, M, L, XL...)</option>
+</select>
+{Error.size && (
+  <p className="text-red-500 text-sm mb-2">{Error.size}</p>
+)}
 
-            {formData.size.unit === "cm" && (
-              <input
-                type="text" // Change to text to accept multiple values
-                name="sizeValue"
-                value={formData.size.values.join(", ") || ""} // Display multiple values as a string
-                onChange={handileaddsize}
-                placeholder="Available sizes (e.g., 30, 20, 43...)"
-                required
-                className="w-full p-2 border border-gray-300 rounded"
-              />
-            )}
+{/* Numeric (inch) input */}
+{formData.size.unit === "inch" && (
+  <div>
+    <label className="block font-medium text-gray-700 mb-1">
+      Enter Sizes (Inch):
+    </label>
+    <input
+      type="text"
+      name="sizeValue"
+      value={formData.size.values.join(", ")}
+      onChange={handileaddsize}
+      placeholder="Example: 28, 30, 32"
+      required
+      className="w-full p-2 border border-gray-300 rounded"
+    />
+  </div>
+)}
 
-            {sizeUnit === "letter" && (
-              <div className="flex flex-wrap">
-                {["S", "M", "L", "XL", "XXL"].map((size) => (
-                  <label key={size} className="mr-3.5 flex">
-                    <input
-                      className="product-check-box"
-                      type="checkbox"
-                      name="sizeValue"
-                      value={size}
-                      checked={formData.size.values.includes(size)}
-                      onChange={handleSizeValueChange}
-                    />
-                    {size}
-                  </label>
-                ))}
-              </div>
-            )}
+{/* Numeric (cm) input */}
+{formData.size.unit === "cm" && (
+  <div>
+    <label className="block font-medium text-gray-700 mb-1">
+      Enter Sizes (CM):
+    </label>
+    <input
+      type="text"
+      name="sizeValue"
+      value={formData.size.values.join(", ")}
+      onChange={handileaddsize}
+      placeholder="Example: 70, 80, 90"
+      required
+      className="w-full p-2 border border-gray-300 rounded"
+    />
+  </div>
+)}
+
+{/* Clothing sizes */}
+{sizeUnit === "letter" && (
+  <div>
+    <label className="block font-medium text-gray-700 mb-1">
+      Select Available Sizes:
+    </label>
+    <div className="flex flex-wrap gap-3">
+      {["XS", "S", "M", "L", "XL", "XXL", "XXXL"].map((size) => (
+        <label
+          key={size}
+          className="flex items-center space-x-2 border px-3 py-1 rounded cursor-pointer"
+        >
+          <input
+            className="accent-blue-500"
+            type="checkbox"
+            name="sizeValue"
+            value={size}
+            checked={formData.size.values.includes(size)}
+            onChange={handleSizeValueChange}
+          />
+          <span>{size}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+)}
+
             <label>Product For (Male/Female/Unisex):</label>
             <select
               name="gender"
