@@ -28,9 +28,12 @@ const EditProduct = () => {
   //   const [setProduct,Product]=useState(null);
   //
   //
-    const categorys = ["Fashion", "Accessories", " phones" , "Electronics","Home & Living"];
+    const categorys = ["Earrings", "Bangles & Bracelets", " Hair Accessories" , "Neck Beauties"," Finger Rings","Anklets & Toe Rings","Bindis & Tikka Sets"," Fancy Essentials"];
 
-  const types = ["Tshirt", "Jeans", " Pant", "Hoodie", "Speaker", "Shoes", "Watch", "Sunglass", "Wallet ", " Headphone"];
+  const types = ["Fancy Keychains", "Wallets / Pouches", " Nose Pins", "Brooches", "Bridal sets", "Fancy Tikkas", "Sticker Bindis", "Silver-finish Toe Rings", "Beaded Anklets", "Chain Anklets",
+    "Statement Rings","Adjustable","Layered Necklaces","Chains","Chokers","Fancy Hair Pins",
+    "Rubber Bands / Scrunchies","Headbands","Hair Clips & Clutches" ,"Buns & Donuts","Traditional Bangles","Kada","Adjustable Bracelets","Charm Bracelets","Studs","Hoops","Jhumkas","Chandbalis","Ear Cuffs"
+  ];
   //
   //
   useEffect(() => {
@@ -196,8 +199,8 @@ const EditProduct = () => {
   // React State and Handlers
 const [file, setFile] = useState(null);
 
-const CLOUD_NAME = 'dsxcm3fie'; // Replace with your Cloudinary cloud name
-const UPLOAD_PRESET = 'Img_upload_preset'; // Replace with your Cloudinary upload preset
+const CLOUD_NAME = 'dljrcyvdi'; // Replace with your Cloudinary cloud name
+const UPLOAD_PRESET = 'my_preset'; // Replace with your Cloudinary upload preset
 
 // Handle file selection
 const handleFileChange = (e) => {
@@ -253,51 +256,90 @@ const handleUpload = async (index) => {
       <h1 className="text-4xl font-bold tracking-tight text-gray-900 border-b p-1 pb-5">
         Edith Product
       </h1>
-      <div className="imageurl-section">
-              <div className="imageurl-label-btn flex items-center">
-                <label>Add Image URL:</label>
-                <Button
-                  variant="plain"
-                  type="button"
-                  onClick={handleAddImage}
-                  className="w-9/12 ml-2 p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                  Add Image
-                </Button>
-              </div>
-              {formData.images.map((image, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  {image.imageUrl && (
-                    <img
-                      src={image.imageUrl}
-                      alt={`Image ${index + 1}`}
-                      className="w-24 h-24 object-cover border border-gray-300 rounded"
-                    />
-                  )}
-                <div style={{ padding: '20px' }}>
-            <h1>Upload Image to Imgur</h1>
-            <input type="file" onChange={handleFileChange} />
-            <button style={{backgroundColor:'black',padding:'3px',color:'white'}} onClick={()=>handleUpload(index)}>Upload</button>        
-            </div>
-                  <label>Color:</label>
-                  <input
-                    type="color"
-                    name={`image-color-${index}`}
-                    value={image.color}
-                    required
-                    onChange={(e) =>
-                      setFormData((prevData) => {
-                        const newImages = [...prevData.images];
-                        newImages[index].color = e.target.value;
-                        return { ...prevData, images: newImages };
-                      })
-                    }
-                    className="w-16 mb-0 color-input m-0 rounded"
-                  />
-                 
-                </div>
-              ))}
-            </div>
+     <div className="image-upload-section">
+                   <label>Product Images: <span className="text-red-500">*</span></label>
+                   {formData.images.map((image, index) => (
+                     <div key={index} className="image-upload-item mb-4">
+                       <div className="flex items-center gap-4 mb-2">
+                         {image.imageUrl ? (
+                           <img
+                             src={image.imageUrl}
+                             alt={`Preview ${index}`}
+                             className="w-24 h-24 object-cover border rounded"
+                           />
+                         ) : (
+                           <div className="w-24 h-24 border rounded flex items-center justify-center bg-gray-100">
+                             No Image
+                           </div>
+                         )}
+                         <div className="flex-1">
+                           <div className="flex gap-2 mb-2">
+                             <input
+                               type="file"
+                               onChange={(e) => handleFileChange(e, index)}
+                               className="hidden"
+                               id={`file-upload-${index}`}
+                             />
+                             <label
+                               htmlFor={`file-upload-${index}`}
+                               className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600"
+                             >
+                               Choose File
+                             </label>
+                             <button
+                               type="button"
+                               onClick={handleUpload}
+                               disabled={!file || currentImageIndex !== index}
+                               className={`px-4 py-2 rounded ${file && currentImageIndex === index ? 'bg-green-500 hover:bg-green-600 text-white' : 'bg-gray-300 cursor-not-allowed'}`}
+                             >
+                               Upload
+                             </button>
+                           </div>
+                           <input
+                             type="text"
+                             value={image.imageUrl}
+                             onChange={(e) => handleImageChange(index, e.target.value)}
+                             placeholder="Or enter image URL directly"
+                             className="w-full p-2 border border-gray-300 rounded"
+                           />
+                         </div>
+                         <div className="flex items-center gap-2">
+                           <input
+                             type="color"
+                             value={image.color}
+                             onChange={(e) => {
+                               const newImages = [...formData.images];
+                               newImages[index].color = e.target.value;
+                               setFormData({...formData, images: newImages});
+                             }}
+                             className="w-10 h-10 cursor-pointer"
+                           />
+                           {formData.images.length > 1 && (
+                             <button
+                               type="button"
+                               onClick={() => handleRemoveImage(index)}
+                               className="p-2 text-red-500 hover:text-red-700"
+                             >
+                               <ClearRoundedIcon />
+                             </button>
+                           )}
+                         </div>
+                       </div>
+                       {file && currentImageIndex === index && (
+                         <p className="text-sm text-gray-600">Selected: {file.name}</p>
+                       )}
+                     </div>
+                   ))}
+                   <button
+                     type="button"
+                     onClick={handleAddImage}
+                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                   >
+                     Add Another Image
+                   </button>
+                 </div>
+
+
       <form onSubmit={handleSubmit}>
         <div className="productform">
           <div className="form-left mx-auto p-4 space-y-4">
@@ -653,3 +695,5 @@ const handleUpload = async (index) => {
 };
 
 export default EditProduct;
+
+

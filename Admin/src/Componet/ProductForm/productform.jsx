@@ -26,12 +26,16 @@ const ProductForm = () => {
     gender: "",
     stock: "",
     category: "",
-    rating: ""
+    rating: "",
+    images: ""
   });
 
-  const categorys = ["Fashion", "Accessories", "Phones", "Electronics", "Home & Living"];
-  const types = ["Tshirt", "Jeans", "Pant", "Hoodie", "Speaker", "Shoes", "Watch", "Sunglass", "Wallet", "Headphone"];
+   const categorys = ["Earrings", "Bangles & Bracelets", " Hair Accessories" , "Neck Beauties"," Finger Rings","Anklets & Toe Rings","Bindis & Tikka Sets"," Fancy Essentials"];
 
+  const types = ["Fancy Keychains", "Wallets / Pouches", " Nose Pins", "Brooches", "Bridal sets", "Fancy Tikkas", "Sticker Bindis", "Silver-finish Toe Rings", "Beaded Anklets", "Chain Anklets",
+    "Statement Rings","Adjustable","Layered Necklaces","Chains","Chokers","Fancy Hair Pins",
+    "Rubber Bands / Scrunchies","Headbands","Hair Clips & Clutches" ,"Buns & Donuts","Traditional Bangles","Kada","Adjustable Bracelets","Charm Bracelets","Studs","Hoops","Jhumkas","Chandbalis","Ear Cuffs"
+  ];
   // Cloudinary configuration
   const CLOUD_NAME = 'dljrcyvdi';
   const UPLOAD_PRESET = 'my_preset';
@@ -55,8 +59,12 @@ const ProductForm = () => {
     shippingInfo: "",
     returnPolicy: "",
     size: {
-      values: [],
       unit: "",
+      values: [],
+      inch: [],
+      cm: [],
+      manualInch: "",
+      manualCm: ""
     },
     rating: 0,
     gender: "",
@@ -68,7 +76,7 @@ const ProductForm = () => {
 
   const [sizeUnit, setSizeUnit] = useState("");
 
-  // Calculate discount percentage if both prices are provided
+  // Calculate discount percentage
   const originalPrice = parseFloat(formData.price) || 0;
   const discountPrice = parseFloat(formData.discountPrice) || 0;
   const discountPercent = originalPrice > 0 
@@ -95,8 +103,12 @@ const ProductForm = () => {
       shippingInfo: "",
       returnPolicy: "",
       size: {
-        values: [],
         unit: "",
+        values: [],
+        inch: [],
+        cm: [],
+        manualInch: "",
+        manualCm: ""
       },
       rating: 0,
       gender: "",
@@ -107,79 +119,92 @@ const ProductForm = () => {
     });
     setSizeUnit("");
     setFile(null);
+    setErrors({
+      name: "",
+      description: "",
+      price: "",
+      Type: "",
+      Producttype: "",
+      tags: "",
+      size: "",
+      gender: "",
+      stock: "",
+      category: "",
+      rating: "",
+      images: ""
+    });
   };
 
   const handleSizeUnitChange = (e) => {
     const unit = e.target.value;
     setSizeUnit(unit);
-    setFormData(prevData => ({
-      ...prevData,
-      size: { ...prevData.size, unit },
+    setFormData(prev => ({
+      ...prev,
+      size: {
+        ...prev.size,
+        unit,
+        values: [],
+        inch: [],
+        cm: [],
+        manualInch: "",
+        manualCm: ""
+      }
     }));
+    setErrors(prev => ({ ...prev, size: "" }));
   };
 
   const handleSizeValueChange = (e) => {
     const value = e.target.value;
     const isChecked = e.target.checked;
 
-    setFormData(prevData => {
-      const updatedValues = isChecked
-        ? [...prevData.size.values, value]
-        : prevData.size.values.filter(size => size !== value);
-
-      return {
-        ...prevData,
-        size: { ...prevData.size, values: updatedValues },
-      };
-    });
+    setFormData(prev => ({
+      ...prev,
+      size: {
+        ...prev.size,
+        values: isChecked
+          ? [...prev.size.values, value]
+          : prev.size.values.filter(size => size !== value)
+      }
+    }));
+    if (isChecked) {
+      setErrors(prev => ({ ...prev, size: "" }));
+    }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name.includes("dimensions")) {
       const key = name.split(".")[1];
-      setFormData(prevData => ({
-        ...prevData,
-        dimensions: { ...prevData.dimensions, [key]: value },
+      setFormData(prev => ({
+        ...prev,
+        dimensions: { ...prev.dimensions, [key]: value },
       }));
     } else {
-      setFormData(prevData => ({ ...prevData, [name]: value }));
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleSizeInput = (e) => {
-    const value = e.target.value;
-    const sizeArray = value
-      .split(",")
-      .map(size => size.trim())
-      .filter(Boolean);
-
-    setFormData(prevData => ({
-      ...prevData,
-      size: { ...prevData.size, values: sizeArray },
-    }));
-  };
-
   const handleImageChange = (index, value) => {
-    setFormData(prevData => {
-      const newImages = [...prevData.images];
+    setFormData(prev => {
+      const newImages = [...prev.images];
       newImages[index].imageUrl = value;
-      return { ...prevData, images: newImages };
+      return { ...prev, images: newImages };
     });
+    setErrors(prev => ({ ...prev, images: "" }));
   };
 
   const handleAddImage = () => {
-    setFormData(prevData => ({
-      ...prevData,
-      images: [...prevData.images, { imageUrl: "", color: "" }],
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, { imageUrl: "", color: "" }],
     }));
   };
 
   const handleRemoveImage = (index) => {
-    setFormData(prevData => {
-      const newImages = [...prevData.images];
+    setFormData(prev => {
+      const newImages = [...prev.images];
       newImages.splice(index, 1);
-      return { ...prevData, images: newImages };
+      return { ...prev, images: newImages };
     });
   };
 
@@ -192,12 +217,32 @@ const ProductForm = () => {
     if (!formData.category.trim()) newErrors.category = "Category is required";
     if (!formData.Producttype.trim()) newErrors.Producttype = "Product type is required";
     if (!formData.Type.trim()) newErrors.Type = "Style type is required";
-    if (!formData.size.values.length) newErrors.size = "Size is required";
     if (!formData.gender.trim()) newErrors.gender = "Gender is required";
     if (!formData.stock) newErrors.stock = "Stock status is required";
     if (formData.rating <= 0) newErrors.rating = "Rating is required";
     if (formData.tags.length === 0) newErrors.tags = "Tags are required";
     
+    // Validate at least one image has a URL
+    const hasValidImage = formData.images.some(img => img.imageUrl.trim() !== "");
+    if (!hasValidImage) newErrors.images = "At least one image is required";
+    
+    // Size validation
+    if (!sizeUnit) {
+      newErrors.size = "Size unit is required";
+    } else {
+      if (sizeUnit === "letter" && formData.size.values.length === 0) {
+        newErrors.size = "At least one size is required";
+      } else if (sizeUnit === "inch" && 
+                 !formData.size.manualInch && 
+                 formData.size.inch.length === 0) {
+        newErrors.size = "Please enter or select sizes";
+      } else if (sizeUnit === "cm" && 
+                 !formData.size.manualCm && 
+                 formData.size.cm.length === 0) {
+        newErrors.size = "Please enter or select sizes";
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -231,10 +276,10 @@ const ProductForm = () => {
 
       const uploadedImageUrl = response.data.secure_url;
 
-      setFormData(prevData => {
-        const newImages = [...prevData.images];
+      setFormData(prev => {
+        const newImages = [...prev.images];
         newImages[currentImageIndex].imageUrl = uploadedImageUrl;
-        return { ...prevData, images: newImages };
+        return { ...prev, images: newImages };
       });
 
       swal("Success!", "Image uploaded successfully", "success");
@@ -255,30 +300,69 @@ const ProductForm = () => {
       return;
     }
 
+    // Prepare the size data
+    let finalSizeValues = [];
+    
+    if (sizeUnit === "letter") {
+      finalSizeValues = formData.size.values;
+    } else if (sizeUnit === "inch") {
+      const manualSizes = formData.size.manualInch 
+        ? formData.size.manualInch.split(',').map(s => s.trim()).filter(s => s)
+        : [];
+      finalSizeValues = [...manualSizes, ...formData.size.inch];
+    } else if (sizeUnit === "cm") {
+      const manualSizes = formData.size.manualCm 
+        ? formData.size.manualCm.split(',').map(s => s.trim()).filter(s => s)
+        : [];
+      finalSizeValues = [...manualSizes, ...formData.size.cm];
+    }
+
+    // Create the final payload
+    const payload = {
+      ...formData,
+      price: parseFloat(formData.price),
+      discountPrice: parseFloat(formData.discountPrice) || 0,
+      weight: parseFloat(formData.weight) || 0,
+      dimensions: {
+        height: parseFloat(formData.dimensions.height) || 0,
+        width: parseFloat(formData.dimensions.width) || 0,
+        depth: parseFloat(formData.dimensions.depth) || 0,
+      },
+      size: {
+        unit: sizeUnit,
+        values: finalSizeValues
+      },
+      images: formData.images.filter(img => img.imageUrl.trim() !== "")
+    };
+
     setIsLoading(true);
     const token = localStorage.getItem("authToken");
 
     try {
       const response = await axios.post(
         "https://trendybazarr.onrender.com/api/data/upload",
-        formData,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
           },
         }
       );
 
-      swal("Success!", "Product added successfully!", "success");
-      resetForm();
-      console.log("Product added:", response.status);
+      if (response.data.success) {
+        swal("Success!", "Product added successfully!", "success");
+        resetForm();
+      } else {
+        throw new Error(response.data.message || "Failed to create product");
+      }
     } catch (error) {
       console.error("Error:", error);
-      swal("Error!", "Failed to create product", "error");
+      swal("Error!", error.message || "Failed to create product", "error");
     } finally {
       setIsLoading(false);
     }
-  };
+  };  
 
   return (
     <div className="addproductform">
@@ -331,6 +415,8 @@ const ProductForm = () => {
                 onChange={handleChange}
                 placeholder="Enter product price"
                 required
+                min="0"
+                step="0.01"
                 className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
               />
               {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
@@ -347,11 +433,12 @@ const ProductForm = () => {
                 value={formData.discountPrice}
                 onChange={handleChange}
                 placeholder="Enter discount price"
+                min="0"
+                step="0.01"
                 className="mt-1 block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
               />
             </div>
 
-            {/* Show price summary if both fields are filled */}
             {originalPrice > 0 && discountPrice > 0 && discountPrice < originalPrice && (
               <div className="text-lg font-semibold text-gray-800 mt-2">
                 ₹{discountPrice}{' '}
@@ -378,6 +465,7 @@ const ProductForm = () => {
 
             <div className="image-upload-section">
               <label>Product Images: <span className="text-red-500">*</span></label>
+              {errors.images && <p className="text-red-500 text-sm">{errors.images}</p>}
               {formData.images.map((image, index) => (
                 <div key={index} className="image-upload-item mb-4">
                   <div className="flex items-center gap-4 mb-2">
@@ -399,6 +487,7 @@ const ProductForm = () => {
                           onChange={(e) => handleFileChange(e, index)}
                           className="hidden"
                           id={`file-upload-${index}`}
+                          accept="image/*"
                         />
                         <label
                           htmlFor={`file-upload-${index}`}
@@ -467,7 +556,7 @@ const ProductForm = () => {
                 value={sizeUnit}
                 onChange={handleSizeUnitChange}
                 required
-                className="w-full p-2 border border-gray-300 rounded mb-2"
+                className={`w-full p-2 border rounded mb-2 ${errors.size ? "border-red-500" : "border-gray-300"}`}
               >
                 <option value="">-- Choose Size Format --</option>
                 <option value="inch">Numeric (Inch)</option>
@@ -479,32 +568,124 @@ const ProductForm = () => {
               {sizeUnit === "inch" && (
                 <div>
                   <label className="block font-medium mb-1">
-                    Enter Sizes (Inch): <span className="text-red-500">*</span>
+                    Enter Sizes (Inch): <span className="text-gray-500 text-xs">(Optional)</span>
                   </label>
                   <input
                     type="text"
-                    value={formData.size.values.join(", ")}
-                    onChange={handleSizeInput}
-                    placeholder="Example: 28, 30, 32"
-                    required
-                    className="w-full p-2 border border-gray-300 rounded"
+                    value={formData.size.manualInch}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        size: {
+                          ...prev.size,
+                          manualInch: e.target.value
+                        }
+                      }));
+                      if (e.target.value) {
+                        setErrors(prev => ({ ...prev, size: "" }));
+                      }
+                    }}
+                    placeholder="e.g., 28, 30, 32"
+                    className="w-full p-2 border border-gray-300 rounded mb-2"
                   />
+
+                  <label className="block font-medium mb-1">
+                    Select Standard Sizes (Inch): <span className="text-gray-500 text-xs">(Optional)</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {["28", "30", "32", "34", "36", "38", "40"].map((size) => (
+                      <label
+                        key={size}
+                        className="flex items-center space-x-2 border px-3 py-1 rounded cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          value={size}
+                          checked={formData.size.inch.includes(size)}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            const updated = checked
+                              ? [...formData.size.inch, size]
+                              : formData.size.inch.filter(s => s !== size);
+                            setFormData(prev => ({
+                              ...prev,
+                              size: {
+                                ...prev.size,
+                                inch: updated
+                              }
+                            }));
+                            if (checked) {
+                              setErrors(prev => ({ ...prev, size: "" }));
+                            }
+                          }}
+                          className="accent-blue-500"
+                        />
+                        <span>{size}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               )}
 
               {sizeUnit === "cm" && (
                 <div>
                   <label className="block font-medium mb-1">
-                    Enter Sizes (CM): <span className="text-red-500">*</span>
+                    Enter Sizes (CM): <span className="text-gray-500 text-xs">(Optional)</span>
                   </label>
                   <input
                     type="text"
-                    value={formData.size.values.join(", ")}
-                    onChange={handleSizeInput}
-                    placeholder="Example: 70, 80, 90"
-                    required
-                    className="w-full p-2 border border-gray-300 rounded"
+                    value={formData.size.manualCm}
+                    onChange={(e) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        size: {
+                          ...prev.size,
+                          manualCm: e.target.value
+                        }
+                      }));
+                      if (e.target.value) {
+                        setErrors(prev => ({ ...prev, size: "" }));
+                      }
+                    }}
+                    placeholder="e.g., 70, 80, 90"
+                    className="w-full p-2 border border-gray-300 rounded mb-2"
                   />
+
+                  <label className="block font-medium mb-1">
+                    Select Standard Sizes (CM): <span className="text-gray-500 text-xs">(Optional)</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {["70", "75", "80", "85", "90", "95"].map((size) => (
+                      <label
+                        key={size}
+                        className="flex items-center space-x-2 border px-3 py-1 rounded cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          value={size}
+                          checked={formData.size.cm.includes(size)}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            const updated = checked
+                              ? [...formData.size.cm, size]
+                              : formData.size.cm.filter(s => s !== size);
+                            setFormData(prev => ({
+                              ...prev,
+                              size: {
+                                ...prev.size,
+                                cm: updated
+                              }
+                            }));
+                            if (checked) {
+                              setErrors(prev => ({ ...prev, size: "" }));
+                            }
+                          }}
+                          className="accent-blue-500"
+                        />
+                        <span>{size}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -517,7 +698,7 @@ const ProductForm = () => {
                     {["XS", "S", "M", "L", "XL", "XXL", "XXXL"].map((size) => (
                       <label
                         key={size}
-                        className="flex items-center space-x-2 border px-3 py-1 rounded cursor-pointer"
+                        className={`flex items-center space-x-2 border px-3 py-1 rounded cursor-pointer ${errors.size ? "border-red-500" : ""}`}
                       >
                         <input
                           type="checkbox"
@@ -552,7 +733,6 @@ const ProductForm = () => {
               </select>
               {errors.gender && <p className="text-red-500 text-sm">{errors.gender}</p>}
             </div>
-
             <div className="category-selection">
               <label>Product Category: <span className="text-red-500">*</span></label>
               <select
@@ -571,7 +751,6 @@ const ProductForm = () => {
               </select>
               {errors.category && <p className="text-red-500 text-sm">{errors.category}</p>}
             </div>
-
             <div className="rating-selection">
               <label>Product Rating: <span className="text-red-500">*</span></label>
               <Rating
@@ -582,13 +761,13 @@ const ProductForm = () => {
                     ...prevData,
                     rating: newValue
                   }));
+                  setErrors(prev => ({ ...prev, rating: "" }));
                 }}
                 precision={0.5}
                 className="mt-1"
               />
               {errors.rating && <p className="text-red-500 text-sm">{errors.rating}</p>}
             </div>
-
             <div className="product-type-selection">
               <label>Product Type: <span className="text-red-500">*</span></label>
               <select
@@ -607,7 +786,6 @@ const ProductForm = () => {
               </select>
               {errors.Producttype && <p className="text-red-500 text-sm">{errors.Producttype}</p>}
             </div>
-
             <div className="style-type-selection">
               <label>Style Type: <span className="text-red-500">*</span></label>
               <select
@@ -625,7 +803,6 @@ const ProductForm = () => {
               </select>
               {errors.Type && <p className="text-red-500 text-sm">{errors.Type}</p>}
             </div>
-
             <div className="tags-input">
               <label>Tags or Keywords: <span className="text-red-500">*</span></label>
               <input
@@ -634,6 +811,9 @@ const ProductForm = () => {
                 onChange={(e) => {
                   const tagsArray = e.target.value.split(",").map(tag => tag.trim()).filter(tag => tag);
                   setFormData({...formData, tags: tagsArray});
+                  if (tagsArray.length > 0) {
+                    setErrors(prev => ({ ...prev, tags: "" }));
+                  }
                 }}
                 placeholder="Add tags separated by commas (e.g., summer, casual, new)"
                 required
@@ -641,7 +821,6 @@ const ProductForm = () => {
               />
               {errors.tags && <p className="text-red-500 text-sm">{errors.tags}</p>}
             </div>
-
             <div className="material-input">
               <label>Material (Optional):</label>
               <input
@@ -653,7 +832,6 @@ const ProductForm = () => {
                 className="w-full p-2 border border-gray-300 rounded"
               />
             </div>
-
             <div className="stock-selection">
               <FormControl>
                 <label>Product Availability: <span className="text-red-500">*</span></label>
@@ -673,7 +851,7 @@ const ProductForm = () => {
               {errors.stock && <p className="text-red-500 text-sm">{errors.stock}</p>}
             </div>
           </div>
-
+       
           <div className="form-right p-4 space-y-4">
             <h2 className="text-lg font-semibold">Dimensions (Optional)</h2>
             <div className="grid grid-cols-3 gap-4">
@@ -685,6 +863,7 @@ const ProductForm = () => {
                   value={formData.dimensions.height}
                   onChange={handleChange}
                   placeholder="Height"
+                  min="0"
                   className="w-full p-2 border border-gray-300 rounded"
                 />
               </div>
@@ -696,6 +875,7 @@ const ProductForm = () => {
                   value={formData.dimensions.width}
                   onChange={handleChange}
                   placeholder="Width"
+                  min="0"
                   className="w-full p-2 border border-gray-300 rounded"
                 />
               </div>
@@ -707,11 +887,11 @@ const ProductForm = () => {
                   value={formData.dimensions.depth}
                   onChange={handleChange}
                   placeholder="Depth"
+                  min="0"
                   className="w-full p-2 border border-gray-300 rounded"
                 />
               </div>
             </div>
-
             <div className="weight-input">
               <label>Weight (Optional):</label>
               <input
@@ -720,10 +900,10 @@ const ProductForm = () => {
                 value={formData.weight}
                 onChange={handleChange}
                 placeholder="Weight in grams"
+                min="0"
                 className="w-full p-2 border border-gray-300 rounded"
               />
             </div>
-
             <div className="warranty-input">
               <label>Warranty (Optional):</label>
               <input
@@ -735,7 +915,6 @@ const ProductForm = () => {
                 className="w-full p-2 border border-gray-300 rounded"
               />
             </div>
-
             <div className="shipping-info-input">
               <label>Shipping Info (Optional):</label>
               <input
@@ -747,7 +926,6 @@ const ProductForm = () => {
                 className="w-full p-2 border border-gray-300 rounded"
               />
             </div>
-
             <div className="return-policy-input">
               <label>Return Policy (Optional):</label>
               <input
@@ -759,12 +937,12 @@ const ProductForm = () => {
                 className="w-full p-2 border border-gray-300 rounded"
               />
             </div>
-
             <button
               type="submit"
               className="w-full py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              disabled={isLoading}
             >
-              Create Product
+              {isLoading ? "Creating..." : "Create Product"}
             </button>
           </div>
         </div>

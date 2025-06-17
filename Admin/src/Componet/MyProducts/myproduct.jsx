@@ -1,19 +1,3 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
-"use client";
-
 import { useEffect, useState } from "react";
 import "./myproducts.css";
 import {
@@ -34,12 +18,11 @@ import Rating from "@mui/material/Rating";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
 import LocalOfferRoundedIcon from "@mui/icons-material/LocalOfferRounded";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useDispatch } from "react-redux";
-import {  edither } from "../Redux/EdithSlice"; 
-import swal from 'sweetalert'
+import { useDispatch, useSelector } from "react-redux";
+import { edither } from "../Redux/EdithSlice"; 
+import swal from 'sweetalert';
 import Navbar from './navbar';
 import { CircularProgress } from "@mui/joy";
- import { useSelector } from "react-redux";
 
 const sortOptions = [
   { name: "Most Popular", href: "#", current: true },
@@ -53,51 +36,50 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export  default function MyProduct() {
+// Helper conversion functions for size units
+const inchToCm = (inch) => (inch * 2.54).toFixed(2);
+const cmToInch = (cm) => (cm / 2.54).toFixed(2);
+
+export default function MyProduct() {
   const dispatch = useDispatch();
-  const [errormsg,setErrorMessage]=useState("")
+  const [errormsg, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Manage loading state
+  const [isLoading, setIsLoading] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [ProductData, setProductData] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const navigate = useNavigate();
-  const [categoryfect,setcategoryfetch]=useState("default");  
+  const [categoryfect, setcategoryfetch] = useState("default");
 
   const title = useSelector((state) => state.category?.value || categoryfect);
-  const set=(ID)=>{
-    dispatch( edither({ID}));
-    localStorage.setItem("id", ID);
 
-    navigate('/EdithProduct')
-  }
+  const set = (ID) => {
+    dispatch(edither({ ID }));
+    localStorage.setItem("id", ID);
+    navigate('/EdithProduct');
+  };
+
   useEffect(() => {
     if (selectedProduct && selectedProduct.images.length > 0) {
-      setSelectedImage(selectedProduct.images[0].imageUrl); // Set the first image when product is selected
+      setSelectedImage(selectedProduct.images[0].imageUrl);
     }
-  }, [selectedProduct]); // Trigger when selectedProduct changes
-  // Initialize with null
-  console.log("a product selected"); // State to track selected product
-  useEffect(() => {
-    setProductData(ProductData);
-  });
+  }, [selectedProduct]);
+
   useEffect(() => {
     const FetchAllProducts = async () => {
       setIsLoading(true);
       try {
         const token = localStorage.getItem("authToken");
         const url = `https://trendybazarr.onrender.com/api/data/gets`;
-  
+
         const response = await axios.get(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-  
+
         const fetchedData = response.data.data || [];
         const normalizedTitle = title?.toLowerCase() || "default";
-  
+
         const filteredByCategory = fetchedData.filter((product) =>
           [
             product.name?.toLowerCase(),
@@ -107,7 +89,7 @@ export  default function MyProduct() {
             ...(product.tags || []).map((tag) => tag.toLowerCase()),
           ].includes(normalizedTitle)
         );
-  
+
         const baseData =
           normalizedTitle === "default" ? [...fetchedData] : filteredByCategory;
         setProductData(baseData.reverse());
@@ -118,16 +100,12 @@ export  default function MyProduct() {
         setIsLoading(false);
       }
     };
-  
+
     FetchAllProducts();
   }, [title]);
-  console.log("Data fetched");
-  
-
 
   const handleDeleteProduct = async (productId) => {
     try {
-      // Show a SweetAlert confirmation dialog
       swal({
         title: "Are you sure?",
         text: "Once deleted, you will not be able to recover this product!",
@@ -139,19 +117,13 @@ export  default function MyProduct() {
           const url = `https://trendybazarr.onrender.com/api/data/delete/${productId}`;
           const token = localStorage.getItem("authToken");
 
-          // Delete request
           await axios.delete(url, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           });
 
-          // Update the product data state after deletion
-          setProductData(ProductData.filter((product) => product.id !== productId));
+          setProductData(ProductData.filter((product) => product._id !== productId));
           window.location.reload();
-          swal("Product deleted successfully!", {
-            icon: "success",
-          });
+          swal("Product deleted successfully!", { icon: "success" });
         } else {
           swal("Product deletion canceled.");
         }
@@ -169,20 +141,18 @@ export  default function MyProduct() {
 
   const selectcolorbaseimage = (index) => {
     setSelectedImage(selectedProduct.images[index].imageUrl);
+  };
 
-  }
-  console.log("Title",title);
-  
   return (
     <div className="bg-white">
       {isLoading && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
-          <div className="text-center">
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-      <CircularProgress /> {/* Loading indicator */}
-    </div></div>
+          <div className="text-center" style={{ textAlign: 'center', marginTop: '20px' }}>
+            <CircularProgress />
+          </div>
         </div>
       )}
+
       <div>
         <Dialog
           open={mobileFiltersOpen}
@@ -210,27 +180,19 @@ export  default function MyProduct() {
                   <XMarkIcon aria-hidden="true" className="h-6 w-6" />
                 </button>
               </div>
-
-              {/* Filters */}
+              {/* Filters content can go here */}
             </DialogPanel>
           </div>
         </Dialog>
 
-        <main className="mx-auto max-w-7xl  sm:px-2 lg:px-8">
-         
-          <Navbar fetch={setcategoryfetch}/>
+        <main className="mx-auto max-w-7xl sm:px-2 lg:px-8">
+          <Navbar fetch={setcategoryfetch} />
 
           <section aria-labelledby="products-heading" className="pb-24 pt-6">
-            <h2 id="products-heading" className="sr-only">
-              Products
-            </h2>
+            <h2 id="products-heading" className="sr-only">Products</h2>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-3">
-              {/* Filters */}
-
-              {/* Product grid */}
-              <div className="product-grid lg:col-span-3  ">
-
+              <div className="product-grid lg:col-span-3">
                 {ProductData && ProductData.length > 0 ? (
                   ProductData.map((product, index) => (
                     <div className="product-card" key={index}>
@@ -240,9 +202,9 @@ export  default function MyProduct() {
                       >
                         {product.images.length > 0 && (
                           <img
-                            src={product.images[0].imageUrl} // Access the first image's URL
+                            src={product.images[0].imageUrl}
                             loading="lazy"
-                            alt={`Image of ${product.name}`} // Descriptive alt text
+                            alt={`Image of ${product.name}`}
                           />
                         )}
                       </div>
@@ -271,7 +233,6 @@ export  default function MyProduct() {
                               )}
                             </p>
                           </div>
-                        
                         </div>
 
                         <div className="edit-delete-btn flex items-center border-solid border-t mt-1.5 p-1">
@@ -283,10 +244,9 @@ export  default function MyProduct() {
                           >
                             Edit
                           </Button>
-
                           <Button
                             sx={{ width: "50%" }}
-                            variant="plain"
+                            variant="solid"
                             color="danger"
                             onClick={() => handleDeleteProduct(product._id)}
                           >
@@ -297,148 +257,90 @@ export  default function MyProduct() {
                     </div>
                   ))
                 ) : (
-                  <h2 style={{ color: "red", textAlign: "center", marginTop: "20px" }}>
-                    No Data Available
-                  </h2>
+                  <p className="text-center mt-10">No Products Available</p>
                 )}
-
-
               </div>
             </div>
           </section>
         </main>
-      </div>
-      {selectedProduct && (
-        <Modal
-          aria-labelledby="modal-title"
-          aria-describedby="modal-desc"
-          open={open}
-          onClose={() => setOpen(false)}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Sheet
-            variant="soft"
-            sx={{
-              overflow: "auto",
-              width: { xs: "100%", sm: 900 }, // Responsive width
-              height: { sm: "70vh", xs: "100vh" },
-              borderRadius: "md",
-              p: 3,
-              boxShadow: "lg",
-              background: "#fff",
-            }}
-          >
-            <ModalClose
-              variant="plain"
-              sx={{
-                m: 1,
-                position: "fixed",
-                top: "20px",
-                border: "solid 1px gray",
-                right: "0px",
-                background: "white",
-              }}
-            />
 
-            <div className="select-product flex">
-              <div className="popup-img-name-des flex  flex-col w-2/4 ">
-                <div className="image-container flex flex-col items-center">
-                  {selectedProduct && selectedProduct.images.length > 0 && (
+        {/* Modal for product details */}
+        {selectedProduct && (
+          <Modal open={open} onClose={() => setOpen(false)} sx={{ overflowY: "auto" }}>
+            <ModalClose sx={{ position: "absolute", top: 10, right: 10 }} />
+            <Box sx={{ display: "flex", flexDirection: "row", gap: 2, p: 2 }}>
+              {/* Left side: Image gallery */}
+              <Box sx={{ flex: 1 }}>
+                {selectedImage && (
+                  <img
+                    src={selectedImage}
+                    alt={`Main product image of ${selectedProduct.name}`}
+                    style={{ width: "100%", objectFit: "contain" }}
+                  />
+                )}
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    overflowX: "auto",
+                    marginTop: 10,
+                  }}
+                >
+                  {selectedProduct.images.map((img, index) => (
                     <img
-                      src={selectedImage}
-                      loading="lazy"
-                      alt={`Image of ${selectedProduct.name}`}
+                      key={index}
+                      src={img.imageUrl}
+                      alt={`Thumbnail ${index + 1} of ${selectedProduct.name}`}
                       style={{
-                        width: "400px",
-                        height: "300px",
+                        width: 70,
+                        height: 70,
                         objectFit: "contain",
-                        padding: "20px",
-                        borderRadius: "10px",
+                        border:
+                          selectedImage === img.imageUrl ? "2px solid blue" : "1px solid gray",
+                        cursor: "pointer",
                       }}
+                      onClick={() => selectcolorbaseimage(index)}
                     />
-                  )}
-
-                  <div className="multiple flex">
-                    {selectedProduct.images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={image.imageUrl} // Set the image URL for the thumbnail
-                        alt={`Product image ${index + 1}`} // Provide an alt description
-                        onClick={() => setSelectedImage(image.imageUrl)} // On click, set the selected image
-                        style={{
-                          width: "70px", // Set a default width for the thumbnail
-                          height: "70px", // Set a default height for the thumbnail
-                          objectFit: "cover", // Ensure the image covers the box
-                          margin: "5px", // Add margin between thumbnails
-                          cursor: "pointer", // Show pointer on hover
-                          border:
-                            selectedImage === image.imageUrl
-                              ? "2px solid blue"
-                              : "1px solid #ccc", // Highlight the selected image
-                        }}
-                      />
-                    ))}
-                  </div>
+                  ))}
                 </div>
+              </Box>
 
-                <div className="pro-name-dis   ">
-                  <p className="product-title">{selectedProduct.name}</p>
-                  <p className="product-discr overflow-auto h-56 w-11/12 p-1">
-                    {selectedProduct.description}
-                  </p>
-                </div>
-              </div>
-
-              <div className="select-product-info  w-2/4">
-                <div className="mt-3 select-pro-price-discount flex items-center gap-5">
-                  <Typography fontSize="sm" fontWeight="lg">
-                    Price: $ {selectedProduct.price}
-                  </Typography>
-                  {selectedProduct.discountPrice && (
-                    <Chip
-                      startDecorator={<LocalOfferRoundedIcon fontSize="md" />}
-                      size="md"
-                      color="success"
-                      variant="outlined"
-                    >
-                      Discount Price: $ {selectedProduct.discountPrice}
-                    </Chip>
-                  )}
-                </div>
-                <Typography fontSize="sm" fontWeight="lg" mt={2}>
-                  Brand : {selectedProduct.brand}
+              {/* Right side: Product details */}
+              <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+                <Typography level="h4" component="h1" sx={{ fontWeight: "bold" }}>
+                  {selectedProduct.name}
                 </Typography>
-                <Typography fontSize="sm" fontWeight="lg" mt={2}>
-                  Category : {selectedProduct.category}
+                <Typography fontSize="sm" fontWeight="lg">
+                  Brand: {selectedProduct.brand}
                 </Typography>
+                <Rating
+                  name="read-only"
+                  value={Number(selectedProduct.rating)}
+                  precision={0.1}
+                  size="small"
+                  readOnly
+                />
                 <Typography
-                  sx={{ display: "flex" }}
+                  sx={{ display: "flex", alignItems: "center", gap: "5px" }}
                   fontSize="sm"
                   fontWeight="lg"
                   mt={2}
                 >
-                  Available Color :{" "}
-                  {selectedProduct.images.map((image, index) => (
-                    <Box
-                      key={index}
-                      onClick={() => selectcolorbaseimage(index)}
-                      sx={{
-                        display: "inline-block",
-                        borderRadius: "50px",
-                        opacity: "70%",
-                        width: "20px",
-                        height: "20px",
-                        backgroundColor: image.color, // Use the color from the image object
-                        border: "1px solid #000", // Optional: border for visibility
-                        marginLeft: index === 0 ? "8px" : "16px", // Space between each color box
-                      }}
-                    />
-                  ))}
+                  Price: ₹{selectedProduct.price}
+                  {selectedProduct.discountPrice && (
+                    <Chip
+                      startDecorator={<LocalOfferRoundedIcon fontSize="md" />}
+                      color="primary"
+                      variant="soft"
+                      sx={{ ml: 1 }}
+                    >
+                      ₹{selectedProduct.discountPrice}
+                    </Chip>
+                  )}
                 </Typography>
+
+                {/* Size display with conversion */}
                 <Typography
                   sx={{ display: "flex", alignItems: "center", gap: "5px" }}
                   fontSize="sm"
@@ -447,161 +349,45 @@ export  default function MyProduct() {
                 >
                   Available {selectedProduct.size.unit} :{" "}
                   <div className="flex gap-2 prduct-size-btn">
-                    {selectedProduct.size.values.map((size, index) => (
-                      <span key={index} className="size-values ">
-                        {size}{selectedProduct.size.unit}
-
-                        {index < selectedProduct.size.values.length - 1}
-                      </span>
-                    ))}
+                    {selectedProduct.size.values.map((size, index) => {
+                      if (selectedProduct.size.unit.toLowerCase() === "in") {
+                        const converted = inchToCm(size);
+                        return (
+                          <span key={index} className="size-values ">
+                            {size} in ({converted} cm)
+                          </span>
+                        );
+                      } else if (selectedProduct.size.unit.toLowerCase() === "cm") {
+                        const converted = cmToInch(size);
+                        return (
+                          <span key={index} className="size-values ">
+                            {size} cm ({converted} in)
+                          </span>
+                        );
+                      } else {
+                        return (
+                          <span key={index} className="size-values ">
+                            {size} {selectedProduct.size.unit}
+                          </span>
+                        );
+                      }
+                    })}
                   </div>
                 </Typography>
-                <Typography fontSize="sm" fontWeight="lg" mt={2}>
-                  Type : {selectedProduct.Type}
-                </Typography>
-                <Typography fontSize="sm" fontWeight="lg" mt={2}>
-                  Product Type : {selectedProduct.Producttype}
-                </Typography>
-                <Typography fontSize="sm" fontWeight="lg" mt={2}>
-                  Gender : {selectedProduct.gender}
-                </Typography>
-                <Typography fontSize="sm" fontWeight="lg" mt={2}>
-                  Material : {selectedProduct.material}
-                </Typography>
-                <Typography fontSize="sm" fontWeight="lg" mt={2}>
-                  Product Availability : {selectedProduct.stock}
-                </Typography>
-                <Typography
-                  sx={{ display: "flex" }}
-                  fontSize="sm"
-                  fontWeight="lg"
-                  mt={2}
-                >
-                  Rating :
-                  <Rating
-                    name="read-only"
-                    value={selectedProduct.rating}
-                    readOnly
-                    precision={0.5}
-                  />
-                </Typography>
-                <div className="other-info mt-4">
-                  <p className="flex text-xs font-bold items-center gap-5">
-                    Other Information
-                  </p>
-                  <hr className=" w-full" />
-                  {selectedProduct.returnPolicy && (
-                    <Typography fontSize="sm" fontWeight="lg" mt={2}>
-                      Return Policy: {selectedProduct.returnPolicy}
-                    </Typography>
-                  )}
 
-                  {selectedProduct.shippingInfo && (
-                    <Typography fontSize="sm" fontWeight="lg" mt={2}>
-                      Shipping Info: {selectedProduct.shippingInfo}
-                    </Typography>
-                  )}
-
-                  {selectedProduct.warranty && (
-                    <Typography fontSize="sm" fontWeight="lg" mt={2}>
-                      Warranty: {selectedProduct.warranty}
-                    </Typography>
-                  )}
-                </div>
-              </div>
-            </div>
-          </Sheet>
-        </Modal>
-      )}
+                {/* Other product info */}
+                <Typography fontSize="sm" fontWeight="lg" mt={2}>
+                  Category: {selectedProduct.category}
+                </Typography>
+                <Typography fontSize="sm" fontWeight="lg" mt={2}>
+                  Type: {selectedProduct.Type || selectedProduct.Producttype}
+                </Typography>
+                {/* Add other fields as needed */}
+              </Box>
+            </Box>
+          </Modal>
+        )}
+      </div>
     </div>
   );
 }
-// }  import React, { useState } from 'react';
-// import { Link, useNavigate } from 'react-router-dom';
-// import { useDispatch } from 'react-redux';
-// import { edither } from '../Redux/EdithSlice';
-// import { useGetProductsQuery, useDeleteProductMutation } from '../Redux/store';
-// import { CircularProgress } from "@mui/joy";
-// import swal from 'sweetalert';
-// import Navbar from './navbar';
-
-// export default function MyProduct() {
-//   const dispatch = useDispatch();
-//   const navigate = useNavigate();
-//   const [categoryfect, setcategoryfetch] = useState("default");
-  
-//   const { data: Products = [], isLoading, error } = useGetProductsQuery();
-//   const [deleteProduct] = useDeleteProductMutation();
-
-//   const handleEdit = (ID) => {
-//     dispatch(edither({ID}));
-//     localStorage.setItem("id", ID);
-//     navigate('/EdithProduct');
-//   };
-
-//   const handleDelete = async (productId) => {
-//     try {
-//       await swal({
-//         title: "Are you sure?",
-//         text: "Once deleted, you will not be able to recover this product!",
-//         icon: "warning",
-//         buttons: true,
-//         dangerMode: true,
-//       });
-
-//       await deleteProduct(productId).unwrap();
-//       swal("Success", "Product deleted successfully!", "success");
-//     } catch (err) {
-//       swal("Error", "Failed to delete product", "error");
-//     }
-//   };
-
-//   if (isLoading) {
-//     return (
-//       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
-//         <CircularProgress />
-//       </div>
-//     );
-//   }
-
-//   if (error) {
-//     return <div>Error loading products: {error.message}</div>;
-//   }
-
-//   return (
-//     <div className="bg-white">
-//       <Navbar fetch={setcategoryfetch} />
-//       <div className="product-grid">
-//         {Products.map((product) => (
-//           <div key={product._id} className="product-card">
-//             <div className="product-image">
-//               <img
-//                 src={product.images[0].imageUrl}
-//                 alt={product.name}
-//                 loading="lazy"
-//               />
-//             </div>
-//             <div className="product-info p-2.5">
-//               <h3 className="product-name">{product.name}</h3>
-//               <p className="price">₹{product.price}</p>
-//               <div className="edit-delete-btn flex gap-2 mt-2">
-//                 <button
-//                   onClick={() => handleEdit(product._id)}
-//                   className="flex-1 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-colors"
-//                 >
-//                   Edit
-//                 </button>
-//                 <button
-//                   onClick={() => handleDelete(product._id)}
-//                   className="flex-1 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors"
-//                 >
-//                   Delete
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }

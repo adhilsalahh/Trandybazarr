@@ -37,17 +37,9 @@ function Navbar() {
     }
   };
   
-  const categories = [
-    "Tshirt",
-    "Jeans",
-    "Pant",
-    "Hoodie",
-    "Speaker",
-    "Shoes",
-    "Watch",
-    "Sunglass",
-    "Wallet",
-    "Headphone",
+  const categories = ["Fancy Keychains", "Wallets / Pouches", " Nose Pins", "Brooches", "Bridal sets", "Fancy Tikkas", "Sticker Bindis", "Silver-finish Toe Rings", "Beaded Anklets", "Chain Anklets",
+    "Statement Rings","Adjustable","Layered Necklaces","Chains","Chokers","Fancy Hair Pins",
+    "Rubber Bands / Scrunchies","Headbands","Hair Clips & Clutches" ,"Buns & Donuts","Traditional Bangles","Kada","Adjustable Bracelets","Charm Bracelets","Studs","Hoops","Jhumkas","Chandbalis","Ear Cuffs"
   ];
 
   const filteredCategories = categories.filter((cat) =>
